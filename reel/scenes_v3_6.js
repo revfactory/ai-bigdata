@@ -236,92 +236,75 @@
     },
   });
 
-  // ───────── P41 Thumbtack · 구도 가(왼쪽 글 칸) — 같은 질문 세 번, 기록 줄에서 고른 테이블이 갈라진다 ─────────
+  // ───────── P41 Thumbtack · 같은 모델 교체를 두 방식으로 채점한다: 답을 냈는지(왼쪽 카드) → 실행 기록(오른쪽 카드) ─────────
+  // 2026-11-06 재구성: 발표자 "41쪽이 무엇을 말하려는지 모르겠다". 원문(arXiv HTML) 표 3·표 6으로 두 설정(Fast·Reasoning)의 값을 모두 확인해
+  // 왼쪽은 개선(답 거부 73→0%, 실제 데이터 답 21→73%), 오른쪽은 새로 늘어난 실패(해석 변동 21→41문항, 도구 한도 0→24실행)를 같은 순서로 보인다.
+  // 원문 6.3절: 답만 채점하면 추론 설정을 더 높게 보고 업그레이드를 조건 없는 개선으로 보고하며 새 실패를 가린다.
   DECK.slide({
-    id: 'p41', stops: [1.8, 3.1, 4.6, 5.8], exit: 0.5, bg: DECK.BGP.flat,
+    id: 'p41', stops: [1.6, 3.0, 4.8, 5.5], exit: 0.5, bg: DECK.BGP.flat,
     setup(el) {
       const R = this.R = UI.root(el);
       this.hd = head(R, SRC.tt);
-      // 왼쪽 글 칸(x 120~800)
-      this.q = UI.ask(R, '답만 채점하면 무엇이 안 보이나', { top: 110 });
-      this.T = UI.title(R, '더 강한 설정 B는/답을 거부하지 않았지만/50문항 중 *41문항*에서 실행마다/쓴 테이블이나 해석이 달랐다', { top: 150, size: 56, width: 700 });
-      const tb = Math.round(150 + 4 * 56 * 1.14 + 24);
-      this.c = UI.context(R, 'Thumbtack(미국 생활 서비스 중개) 사내 분석 에이전트에<br>질문 50개를 3번씩 실행. 설정 A·B는 모델 설정만 다르다', { top: tb, width: 680 });
-      this.m = UI.meaning(R, '→ 답만 채점하면 안 보이던 것이 기록에 보였다', { top: 566, width: 680, size: 30 });
+      this.q = UI.ask(R, '답만 채점하면 무엇을 놓치나', { top: 104 });
+      this.T = UI.title(R, '추론 설정으로 바꾸자 답을 거부하는 실패는 사라졌지만/조회한 테이블이나 질문 해석이 반복마다 바뀐 문항은 *21개에서 41개*로 늘었다', { top: 146, size: 50 });
+      this.c = UI.context(R, 'Thumbtack(미국 생활 서비스 중개) 사내 분석 에이전트. 모델 설정만 다른 빠른 설정(Fast)과 추론 설정(Reasoning)으로 질문 50개를 3번씩 실행', { top: 282 });
 
-      // 오른쪽 도식 칸(x 860~1800): 위 기록 줄 3개, 아래 수치 3줄
-      const OX = 860;
-      this.chip = exampleChip(R, OX, 140);
-      this.cap = txt(R, OX + 192, 143, '같은 질문 1개를 설정 B로 3번 실행한 기록', { font: '600 28px/1.34 Pretendard', color: 'var(--ink2)' });
-      const RY = [200, 284, 368], NAMES = ['테이블 A', '테이블 B', '테이블 C'];
-      const PILL = [[OX + 130, 62], [OX + 630, 80], [OX + 724, 56]], ANS = [OX + 794, 120];
-      this.CX0 = OX + 120; this.CX1 = OX + 935;
-      this.rows = RY.map((y, i) => {
-        const o = { y };
-        o.lab = txt(R, OX, y + 9, `실행 ${i + 1}`, Object.assign({ color: 'var(--ink2)' }, MONO));
-        o.pills = PILL.map(([x, w]) => div(R, { left: x + 'px', top: (y + 16) + 'px', width: w + 'px', height: '22px', borderRadius: '11px', background: 'rgba(200,190,255,.38)' }));
-        o.cell = div(R, { left: (OX + 210) + 'px', top: y + 'px', width: '360px', height: '54px', boxSizing: 'border-box', borderRadius: '10px', border: '2px solid rgba(190,170,255,.45)',
-          background: 'rgba(22,18,96,.55)', display: 'flex', alignItems: 'center', gap: '18px', padding: '0 18px', whiteSpace: 'nowrap' },
-          `<span style="font:600 30px/1 Pretendard;color:var(--ink2)">고른 테이블</span><span class="v" style="font:700 30px/1 var(--mono);color:var(--ink)">${NAMES[i]}</span>`);
-        o.v = o.cell.querySelector('.v');
-        o.cellX = OX + 210;
-        o.ans = div(R, { left: ANS[0] + 'px', top: (y + 16) + 'px', width: ANS[1] + 'px', height: '22px', borderRadius: '11px', background: 'rgba(200,190,255,.38)' });
-        o.cur = div(R, { left: '0px', top: (y - 4) + 'px', width: '3px', height: '62px', background: 'var(--cyan)', borderRadius: '2px' });
+      const CT = 344, CH = 244;
+      const NUM = (c, sz = 40) => `font:800 ${sz}px/1 Pretendard;font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:${c}`;
+      const SUB = 'font:600 28px/1 Pretendard;color:var(--dim)';
+      const ARR = `<span style="${SUB}">→</span>`;
+      const pair = (a, b, tone, w) => `<span style="${NUM('var(--dim)', 36)}">${a}</span>${ARR}<span class="b" style="${NUM(tone)};display:inline-block;min-width:${w}px;text-align:right">${b}</span>`;
+      const card = (x, w, title, tag, rows, mark, foot, tone) => {
+        const o = {};
+        o.box = div(R, { left: x + 'px', top: CT + 'px', width: w + 'px', height: CH + 'px', boxSizing: 'border-box', borderRadius: '20px',
+          background: 'rgba(22,18,96,.55)', border: '1.5px solid rgba(190,170,255,.35)' });
+        o.head = div(R, { left: (x + 32) + 'px', top: (CT + 20) + 'px', width: (w - 64) + 'px', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', whiteSpace: 'nowrap' },
+          `<span style="font:700 30px/1.2 Pretendard;color:var(--ink);letter-spacing:-.015em">${title}</span><span style="${SUB}">${tag}</span>`);
+        o.rows = rows.map((r, i) => div(R, { left: (x + 32) + 'px', top: (CT + 76 + i * 54) + 'px', width: (w - 64) + 'px', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', whiteSpace: 'nowrap' },
+          `<span style="font:600 28px/1.3 Pretendard;color:var(--ink2);letter-spacing:-.012em">${r[0]}</span><span style="display:flex;align-items:baseline;gap:18px">${r[1]}</span>`));
+        o.vals = o.rows.map(d => d.querySelector('.b'));
+        o.foot = div(R, { left: (x + 32) + 'px', top: (CT + 188) + 'px', display: 'flex', alignItems: 'center', gap: '14px', whiteSpace: 'nowrap',
+          font: '700 30px/1.2 Pretendard', color: tone, letterSpacing: '-.015em' }, mark + `<span>${foot}</span>`);
         return o;
-      });
-      const badge = (x, y, ch, col) => div(R, { left: (x - 17) + 'px', top: (y - 17) + 'px', width: '34px', height: '34px', borderRadius: '50%', boxSizing: 'border-box',
-        border: `2px solid ${col}`, background: '#1a1660', color: col, font: '800 26px/30px Pretendard', textAlign: 'center' }, ch);
-      // ≠ 표시는 고른 테이블 칸 오른쪽 12px 바깥(두 줄 사이). 답이 같았는지는 원문에 없어 답 칸에는 표시를 두지 않는다(2026-11-06 수정)
-      this.neq = [0, 1].map(i => badge(OX + 210 + 360 + 12 + 17, RY[i] + 69, '≠', 'var(--coral)'));
-
-      this.sep = div(R, { left: OX + 'px', top: '444px', width: '940px', height: '2px', background: 'rgba(190,170,255,.35)', transformOrigin: '0 50%' });
-      const N = (v, c) => `<span style="font:800 40px/1 Pretendard;font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:${c}">${v}</span>`;
-      const AB = (t) => `<span style="font:700 30px/1 Pretendard;color:var(--ink2);margin:0 14px 0 0">${t}</span>`;
-      const ARR = '<span style="font:700 30px/1 Pretendard;color:var(--dim);margin:0 14px">→</span>';
-      const row2 = (l, v) => `<span style="font:600 30px/1 Pretendard;color:var(--ink)">${l}</span><span style="display:flex;align-items:baseline">${v}</span>`;
-      const NY = [462, 520, 578];
-      this.nums = [
-        div(R, { left: OX + 'px', top: NY[0] + 'px', width: '940px', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', whiteSpace: 'nowrap' },
-          row2('처음부터 답을 거부한 실행:', AB('A') + N('73%', 'var(--ink2)') + ARR + AB('B') + N('0%', 'var(--mint)'))),
-        div(R, { left: OX + 'px', top: NY[1] + 'px', width: '940px', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', whiteSpace: 'nowrap' },
-          row2('실제 데이터로 답한 실행:', AB('A') + N('21%', 'var(--ink2)') + ARR + AB('B') + N('73%', 'var(--mint)'))),
-        txt(R, OX, NY[2] + 4, 'B 실행 150개 중 <b style="font:800 34px/1 Pretendard;color:var(--amber)">24개(16%)</b> 도구 호출 한도 소진'),
-      ];
+      };
+      // 왼쪽: 답을 냈는지로 채점(설정별 실행 150개). 추론 설정 값은 빠른 설정 값에서 출발해 바뀐다
+      this.L = card(120, 730, '답을 냈는지로 보면', '빠른 → 추론 · 실행 150개씩', [
+        ['처음부터 답을 거부한 실행', pair('73%', '0%', 'var(--mint)', 92)],
+        ['실제 데이터로 답한 실행', pair('21%', '73%', 'var(--mint)', 92)],
+      ], MARK.ok, '추론 설정이 더 나았다', 'var(--mint)');
+      this.L.note = div(R, { left: '152px', top: (CT + 192) + 'px', width: '666px', textAlign: 'right', font: '600 28px/1.2 Pretendard', color: 'var(--dim)', whiteSpace: 'nowrap' }, '나머지 비율은 원문 분류 없음');
+      // 오른쪽: 같은 교체를 실행 기록으로 채점
+      this.Rc = card(890, 910, '실행 기록으로 보면', '빠른 → 추론 · 문항 50개, 실행 150개', [
+        ['조회한 테이블이나 질문 해석이 반복마다 바뀐 문항', pair('21개', '41개', 'var(--coral)', 96)],
+        ['도구 호출 한도에 걸린 실행', pair('0개', '24개', 'var(--coral)', 96)],
+      ], MARK.no, '추론 설정에서 두 실패가 모두 늘었다', 'var(--coral)');
+      this.m = UI.meaning(R, '→ 답을 냈는지만 채점하면 설정 교체가 개선으로만 보이고, 새로 늘어난 실패는 실행 기록에서 보인다', { top: 606, size: 30 });
     },
     render(lt, ctx) {
       UI.headerIn(this.hd, lt);
       UI.lineIn(this.q, lt, 0.05);
-      UI.titleIn(this.T, lt, 0.2, { each: 0.022, lineGap: 0.12 });
-      UI.lineIn(this.c, lt, 1.0);
-      UI.lineIn(this.chip, lt, 1.2);
-      UI.lineIn(this.cap, lt, 1.3);
-      // ②③ 기록 줄이 한 줄씩 재생된다(왼쪽에서 오른쪽으로 단계가 켜진다)
-      const T0 = [1.85, 3.15, 3.5];
-      const X0 = this.CX0, XW = this.CX1 - this.CX0;
-      this.rows.forEach((o, i) => {
-        const t0 = T0[i], dur = 0.85;
-        UI.rise(o.lab, lt, t0, { x: -16, y: 0, blur: 0, dur: 0.35 });
-        const cp = clamp((lt - t0 - 0.1) / dur);
-        css(o.cur, { left: (X0 + cp * XW).toFixed(1) + 'px', opacity: (lt > t0 + 0.1 && cp < 1 ? 1 : 0).toFixed(2) });
-        const on = (x) => prog(lt, t0 + 0.1 + clamp((x - X0) / XW) * dur, 0.2);
-        o.pills.forEach(p => { const k = on(parseFloat(p.style.left)); css(p, { opacity: k.toFixed(3), transform: `scaleX(${(0.4 + 0.6 * k).toFixed(3)})`, transformOrigin: '0 50%' }); });
-        const kc = on(o.cellX);
-        css(o.cell, { opacity: kc.toFixed(3), transform: `translateX(${((1 - kc) * -12).toFixed(1)}px)` });
-        css(o.v, { opacity: prog(lt, t0 + 0.1 + 0.4 * dur, 0.2).toFixed(3) });
-        const ka = on(parseFloat(o.ans.style.left));
-        css(o.ans, { opacity: ka.toFixed(3), transform: `scaleX(${(0.4 + 0.6 * ka).toFixed(3)})`, transformOrigin: '0 50%' });
-      });
-      // ③ 끝: 고른 테이블 칸이 서로 다르다는 표시
-      const mk = prog(lt, 4.2, 0.3);
-      this.rows.forEach(o => {
-        css(o.cell, { borderColor: mk > 0.01 ? `rgba(255,122,138,${(0.45 + 0.5 * mk).toFixed(2)})` : 'rgba(190,170,255,.45)' });
-        o.v.style.color = mk > 0.5 ? 'var(--coral)' : 'var(--ink)';
-      });
-      this.neq.forEach((b, i) => popIn(b, lt, 4.2 + i * 0.08));
-      // ④ 아래 수치와 의미 줄
-      css(this.sep, { transform: `scaleX(${prog(lt, 4.6, 0.4, ease.swift).toFixed(3)})` });
-      this.nums.forEach((n, i) => UI.rise(n, lt, 4.7 + i * 0.16, { x: 24, y: 0 }));
-      UI.lineIn(this.m, lt, 5.25);
+      UI.titleIn(this.T, lt, 0.15, { each: 0.014 });
+      UI.lineIn(this.c, lt, 0.95);
+      const show = (o, t0) => {
+        UI.rise(o.box, lt, t0, { y: 24, blur: 0 });
+        UI.lineIn(o.head, lt, t0 + 0.1);
+        o.rows.forEach((r, i) => UI.rise(r, lt, t0 + 0.3 + i * 0.25, { x: 20, y: 0 }));
+        UI.lineIn(o.foot, lt, t0 + 1.0);
+        if (o.note) UI.lineIn(o.note, lt, t0 + 1.05);
+        return (i) => prog(lt, t0 + 0.45 + i * 0.25, 0.6, ease.outQuart);
+      };
+      // ② 왼쪽 카드: 추론 설정 값이 빠른 설정 값에서 출발해 0%, 73%로 바뀐다
+      const pL = show(this.L, 1.65);
+      this.L.vals[0].textContent = Math.round(lerp(73, 0, pL(0))) + '%';
+      this.L.vals[1].textContent = Math.round(lerp(21, 73, pL(1))) + '%';
+      // ③ 오른쪽 카드: 같은 교체를 기록으로 보면 41개, 24개로 늘었다
+      const pR = show(this.Rc, 3.05);
+      this.Rc.vals[0].textContent = Math.round(lerp(21, 41, pR(0))) + '개';
+      this.Rc.vals[1].textContent = Math.round(lerp(0, 24, pR(1))) + '개';
+      const hot = prog(lt, 4.2, 0.4);
+      css(this.Rc.box, { borderColor: `rgba(255,122,138,${(0.35 + 0.45 * hot).toFixed(2)})` });
+      // ④ 의미 줄
+      UI.lineIn(this.m, lt, 4.85);
       UI.exit(this.R, lt, ctx);
     },
   });
@@ -548,7 +531,7 @@
       this.RH = V3.ruleHead(R, { n: 7, text: '사용하기 전에/평가 질문을 적고,/답과 함께/*실행 기록*을 채점한다' });
       this.ev = div(R, { left: '120px', top: (this.RH.bottom + 22) + 'px', width: '800px', boxSizing: 'border-box', padding: '10px 18px 12px', borderRadius: '12px',
         border: '1.5px solid rgba(190,170,255,.45)', background: 'rgba(22,18,96,.45)', font: '500 30px/1.4 Pretendard', color: 'var(--ink2)', letterSpacing: '-.015em' },
-        '근거: Snowflake 150개·50% · Thumbtack: 50문항 중 41문항에서 실행마다 고른 테이블이 다름');
+        '근거: Snowflake 150개·50% · Thumbtack: 50문항 중 41문항에서 테이블이나 해석이 반복마다 바뀜');
 
       // 오른쪽 칸(x 980~1800)
       const QX = [1368, 1464, 1560, 1656, 1752];
