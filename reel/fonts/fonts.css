@@ -1,0 +1,10 @@
+/* new_project.py 가 만든다. 실제로 있는 폰트만 적는다. 쓰는 굵기와 font-weight 가 맞아야 대체 글꼴이 안 나온다. */
+@font-face { font-family: "JetBrains Mono"; src: url("JetBrainsMono-400.ttf") format("truetype"); font-weight: 400; font-display: block; }
+@font-face { font-family: "JetBrains Mono"; src: url("JetBrainsMono-500.ttf") format("truetype"); font-weight: 500; font-display: block; }
+@font-face { font-family: "JetBrains Mono"; src: url("JetBrainsMono-700.ttf") format("truetype"); font-weight: 700; font-display: block; }
+@font-face { font-family: "Paperlogy"; src: url("Paperlogy-400.ttf") format("truetype"); font-weight: 400; font-display: block; }
+@font-face { font-family: "Paperlogy"; src: url("Paperlogy-600.ttf") format("truetype"); font-weight: 600; font-display: block; }
+@font-face { font-family: "Paperlogy"; src: url("Paperlogy-700.ttf") format("truetype"); font-weight: 700; font-display: block; }
+@font-face { font-family: "Paperlogy"; src: url("Paperlogy-800.ttf") format("truetype"); font-weight: 800; font-display: block; }
+@font-face { font-family: "Paperlogy"; src: url("Paperlogy-900.ttf") format("truetype"); font-weight: 900; font-display: block; }
+@font-face { font-family: "Pretendard"; src: url("PretendardVariable.ttf") format("truetype"); font-weight: 45 920; font-display: block; }

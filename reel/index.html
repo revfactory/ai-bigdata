@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ko" data-fonts="Pretendard,JetBrains Mono,Paperlogy">
+<head>
+<meta charset="utf-8">
+<title>AI 에이전트로 다시 설계하는 빅데이터 활용</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+  /* ── 색 토큰: 행사 배경(보라색 웨이브)에서 뽑은 값 ── */
+  :root {
+    --bg0: #0c0b3e;      /* 가장 어두운 남보라 */
+    --bg1: #1a1d8c;      /* 남색 */
+    --bg2: #3330d6;      /* 전기 청보라 */
+    --violet: #8f45ff;
+    --magenta: #d64cff;
+    --pink: #ff6ef2;
+    --cyan: #6fe2ff;     /* 강조 1: 숫자·핵심어 */
+    --mint: #73f5c6;     /* 확인됨·통과 */
+    --amber: #ffcb66;    /* 주의·한계 */
+    --coral: #ff7a8a;    /* 실패·위험 */
+    --ink: #f6f3ff;
+    --ink2: rgba(238, 232, 255, .78);
+    --dim: rgba(222, 214, 255, .56);
+    --line: rgba(190, 170, 255, .30);
+    --glass: rgba(22, 18, 96, .58);
+    --glass2: rgba(40, 30, 150, .42);
+    --display: "Pretendard", sans-serif;
+    --num: "Pretendard", sans-serif;
+    --mono: "JetBrains Mono", "Pretendard", monospace;
+    --logo: "Paperlogy", "Pretendard", sans-serif;
+  }
+  html, body { margin: 0; height: 100%; background: #05041c; overflow: hidden; }
+  #wrap { transform-origin: 0 0; position: absolute; left: 0; top: 0; }
+  #stage { position: relative; overflow: hidden; background: var(--bg0); color: var(--ink);
+           font-family: "Pretendard", sans-serif; font-kerning: normal; -webkit-font-smoothing: antialiased;
+           word-break: keep-all; font-feature-settings: "tnum" 0; }
+  .cam, .top, .scene { position: absolute; inset: 0; }
+  .scene { overflow: hidden; }
+  .a { position: absolute; }
+  .full { position: absolute; inset: 0; }
+  .center { position: absolute; left: 0; right: 0; text-align: center; }
+  .display { font-family: var(--display); font-weight: 900; letter-spacing: -0.04em; line-height: 1.08; }
+  .mono { font-family: var(--mono); }
+  .tnum { font-variant-numeric: tabular-nums; }
+  .player { position: fixed; left: 0; right: 0; bottom: 0; height: 44px; display: flex; gap: 12px; align-items: center;
+            padding: 0 12px; background: #111; color: #bbb; font: 12px/1 Menlo, monospace; z-index: 50; }
+  .player .scrub { flex: 1; }
+
+  /* ── 공용 부품(ui.js) ── */
+  .u-sec { position: absolute; left: 120px; top: 48px; display: flex; align-items: center; gap: 16px;
+           font: 600 26px/1 var(--display); letter-spacing: .02em; color: var(--ink2); white-space: nowrap; }
+  .u-sec b { font: 700 24px/1 var(--mono); color: var(--cyan); letter-spacing: .04em; }
+  .u-sec i { display: block; width: 44px; height: 2px; background: linear-gradient(90deg, var(--cyan), transparent); }
+  .u-src { position: absolute; right: 64px; top: 44px; max-width: 760px; text-align: right;
+           font: 500 21px/1.35 var(--display); color: var(--dim); letter-spacing: -.005em; }
+  .u-src em { font-style: normal; color: var(--amber); white-space: nowrap; }
+  .u-title { position: absolute; left: 120px; top: 132px; width: 1640px; font-family: var(--display);
+             font-size: 80px; line-height: 1.14; letter-spacing: -.035em; color: var(--ink); }
+  .u-title .ln { display: block; white-space: nowrap; }
+  .u-title .hl { color: var(--cyan); }
+  .u-chip { display: inline-flex; align-items: center; gap: 10px; padding: 9px 18px 10px; border-radius: 999px;
+            font: 600 26px/1 var(--display); color: var(--ink); background: rgba(111, 226, 255, .14);
+            border: 1.5px solid rgba(111, 226, 255, .55); white-space: nowrap; }
+  .u-card { position: absolute; border-radius: 22px; background: var(--glass);
+            border: 1.5px solid var(--line); box-shadow: 0 30px 80px rgba(4, 2, 40, .45), inset 0 1px 0 rgba(255,255,255,.08); }
+  .u-code { position: absolute; border-radius: 18px; background: rgba(8, 6, 40, .82); border: 1.5px solid rgba(150, 130, 255, .35);
+            font: 500 27px/1.5 var(--mono); color: #e9e4ff; padding: 26px 34px; white-space: pre; letter-spacing: -.01em;
+            box-shadow: 0 30px 80px rgba(4, 2, 40, .55); }
+  .u-code .ln { display: block; }
+  .u-code .k { color: #ff8ef5; } .u-code .s { color: #8ff0c9; } .u-code .c { color: rgba(200, 190, 255, .55); }
+  .u-code .n { color: #ffd27a; } .u-code .f { color: #7fdcff; }
+  .u-num { font-family: var(--num); font-weight: 900; letter-spacing: -.04em; font-variant-numeric: tabular-nums; line-height: 1; }
+  .u-ask { position: absolute; display: flex; align-items: center; gap: 14px; white-space: nowrap;
+           font: 600 28px/1.2 var(--display); color: var(--ink2); letter-spacing: -.01em; }
+  .u-ask b { font: 800 20px/1 var(--mono); color: #0c0b3e; background: var(--cyan); border-radius: 6px; padding: 5px 8px 4px; }
+  .u-ctx { position: absolute; font: 500 28px/1.42 var(--display); color: var(--ink2); letter-spacing: -.012em; }
+  .u-ctx b { color: var(--ink); font-weight: 700; }
+  .u-mean { position: absolute; display: flex; gap: 16px; align-items: baseline; font: 700 32px/1.3 var(--display); color: var(--ink); letter-spacing: -.02em; }
+  .u-mean i { font-style: normal; color: var(--cyan); font-weight: 800; }
+  .u-term { position: absolute; display: flex; gap: 14px; align-items: baseline; font: 500 28px/1.35 var(--display); color: var(--ink2); }
+  .u-term b { flex: none; font: 700 28px/1.35 var(--display); color: var(--amber); }
+  .u-pageno { position: absolute; right: 56px; bottom: 38px; z-index: 30; font: 600 24px/1 var(--mono); letter-spacing: .04em;
+               color: rgba(222, 214, 255, .55); font-variant-numeric: tabular-nums; pointer-events: none; }
+  .u-pageno b { font-weight: 700; color: rgba(246, 243, 255, .92); }
+  .u-guide { position: absolute; left: 0; right: 0; top: 648px; height: 0; border-top: 3px dashed rgba(255, 90, 90, .8); z-index: 99; }
+  .u-guide::after { content: '가림 시작(y=648, 하단 40%)'; position: absolute; right: 20px; top: 6px; font: 700 22px/1 var(--display); color: #ff8080; }
+</style>
+</head>
+<body>
+<div id="wrap"><div id="stage"></div></div>
+<script src="timeline.js"></script>
+<script src="engine.js"></script>
+<script src="deck_order_v3.js"></script>
+<script src="deck.js"></script>
+<script src="ui.js"></script>
+<script src="ui_v3.js"></script>
+<script src="scenes_main.js"></script>
+<script src="scenes_v3_1.js"></script>
+<script src="scenes_v3_2.js"></script>
+<script src="scenes_v3_3.js"></script>
+<script src="scenes_v3_4.js"></script>
+<script src="scenes_v3_5.js"></script>
+<script src="scenes_v3_6.js"></script>
+<script src="scenes_v3_7.js"></script>
+<script src="deck_finish.js"></script>
+</body>
+</html>

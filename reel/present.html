@@ -1,0 +1,8 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>발표 시작</title>
+<script>
+  // 발표 모드로 이동한다. ?p=12 를 붙이면 12번 장에서 시작한다.
+  const q = new URLSearchParams(location.search);
+  location.replace('index.html?render=1&deck=1' + (q.get('p') ? '&p=' + q.get('p') : ''));
+</script>
